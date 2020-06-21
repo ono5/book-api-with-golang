@@ -1,21 +1,18 @@
-FROM golang:latest
+FROM golang:1.14
 
 ENV SRC_DIR=/go/src/github.com/ono5/book-list
+ENV GOBIN=/go/bin
+ENV GO111MODULE=on
+ENV GOPATH=
 
-# ENV GOBIN=/go/bin
-
-# WORKDIR $GOBIN
+COPY go.mod go.sum ./
+RUN go mod download
 
 ADD ./api $SRC_DIR
-WORKDIR $SRC_DIR/api
+WORKDIR $SRC_DIR
 
-# RUN cd /go/src/;
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o $GOBIN
 
-# mysql のドライバ
-RUN go get github.com/lib/pq && \
-    go get github.com/gorilla/mux && \
-    go get github.com/subosito/gotenv
+RUN ls /go/bin
 
-RUN go install github.com/ono5/book-list/
-
-ENTRYPOINT ["go", "run", "main.go"]
+ENTRYPOINT ["/go/bin/book-list"]
