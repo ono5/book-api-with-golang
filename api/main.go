@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"database/sql"
 	_ "database/sql"
@@ -65,60 +64,73 @@ func main() {
 }
 
 func getBooks(w http.ResponseWriter, r *http.Request) {
+	var book Book
+	books = []Book{}
+
+	rows, err := db.Query("select * from books")
+	logFatal(err)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
+		logFatal(err)
+
+		books = append(books, book)
+	}
+
 	json.NewEncoder(w).Encode(books)
 }
 
 func getBook(w http.ResponseWriter, r *http.Request) {
+	var book Book
 	params := mux.Vars(r)
 
-	id, err := strconv.Atoi(params["id"])
-	if err != nil {
-		log.Fatal(err)
-	}
+	rows := db.QueryRow("select * from books where id=$1", params["id"])
 
-	for _, book := range books {
-		if book.ID == id {
-			json.NewEncoder(w).Encode(&book)
-		}
-	}
+	err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(book)
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
-	_ = json.NewDecoder(r.Body).Decode(&book)
+	var bookID int
 
-	books = append(books, book)
+	json.NewDecoder(r.Body).Decode(&book)
 
-	json.NewEncoder(w).Encode(books)
+	err := db.QueryRow("insert into books (title, author, year) values($1, $2, $3) RETURNING id;",
+		book.Title, book.Author, book.Year).Scan(&bookID)
+
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(bookID)
 }
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
-	_ = json.NewDecoder(r.Body).Decode(&book)
 
-	for i, item := range books {
-		if item.ID == book.ID {
-			books[i] = book
-		}
-	}
+	json.NewDecoder(r.Body).Decode(&book)
 
-	json.NewEncoder(w).Encode(books)
+	result, err := db.Exec("update books set title=$1, author=$2, year=$3 where id=$4 RETURNING id",
+		&book.Title, &book.Author, &book.Year, &book.ID)
+	logFatal(err)
+
+	rowsUpdated, err := result.RowsAffected()
+	logFatal(err)
+
+	json.NewEncoder(w).Encode(rowsUpdated)
 }
 
 func removeBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	id, err := strconv.Atoi(params["id"])
-	if err != nil {
-		log.Fatal(err)
-	}
+	result, err := db.Exec("delete from books where id = $1", params["id"])
+	logFatal(err)
 
-	for i, item := range books {
-		log.Println(i)
-		if item.ID == id {
-			books = append(books[:i], books[i+1:]...)
-		}
-	}
+	rowsDeleted, err := result.RowsAffected()
+	logFatal(err)
 
-	json.NewEncoder(w).Encode(books)
+	json.NewEncoder(w).Encode(rowsDeleted)
 }
