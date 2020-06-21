@@ -2,13 +2,14 @@ FROM golang:latest
 
 ENV SRC_DIR=/go/src/github.com/ono5/book-list
 
-ENV GOBIN=/go/bin
+# ENV GOBIN=/go/bin
 
-WORKDIR $GOBIN
+# WORKDIR $GOBIN
 
 ADD ./api $SRC_DIR
+WORKDIR $SRC_DIR/api
 
-RUN cd /go/src/;
+# RUN cd /go/src/;
 
 # mysql のドライバ
 RUN go get github.com/lib/pq && \
@@ -17,4 +18,4 @@ RUN go get github.com/lib/pq && \
 
 RUN go install github.com/ono5/book-list/
 
-ENTRYPOINT ["./book-list"]
+ENTRYPOINT ["go", "run", "main.go"]
