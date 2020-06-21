@@ -2,14 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
+	"database/sql"
 	_ "database/sql"
 
 	_ "github.com/lib/pq"
-	_ "github.com/subosito/gotenv"
 
 	"github.com/gorilla/mux"
 )
@@ -22,8 +24,27 @@ type Book struct {
 }
 
 var books []Book
+var db *sql.DB
+
+func logFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
+	var err error
+	pgURL := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"),
+	)
+
+	db, err = sql.Open("postgres", pgURL)
+	logFatal(err)
+
 	router := mux.NewRouter()
 
 	books = append(books,
