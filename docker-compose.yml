@@ -15,8 +15,8 @@ services:
             - POSTGRES_USER=admin
             - POSTGRES_PASSWORD=admin
             - POSTGRES_DB=book_list
-        # volumes:
-        #     - ./api:/go/src/github.com/ono5/book-list/api
+        volumes:
+            - ./api:/go/src/github.com/ono5/book-list/api
 
     postgres:
         build:

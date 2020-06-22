@@ -60,6 +60,7 @@ func main() {
 	router.HandleFunc("/books", updateBook).Methods("PUT")
 	router.HandleFunc("/books/{id}", removeBook).Methods("DELETE")
 
+	log.Println("Server Start...")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
 
