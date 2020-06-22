@@ -1,4 +1,4 @@
-module books-list
+module github.com/ono5/books-list
 
 go 1.14
 

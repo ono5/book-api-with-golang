@@ -11,18 +11,12 @@ import (
 	_ "database/sql"
 
 	_ "github.com/lib/pq"
+	"github.com/ono5/books-list/api/models"
 
 	"github.com/gorilla/mux"
 )
 
-type Book struct {
-	ID     int    `json:"id"`
-	Title  string `json:"title"`
-	Author string `json:"author"`
-	Year   string `json:"year"`
-}
-
-var books []Book
+var books []models.Book
 var db *sql.DB
 
 func logFatal(err error) {
@@ -46,14 +40,6 @@ func main() {
 
 	router := mux.NewRouter()
 
-	books = append(books,
-		Book{ID: 1, Title: "Golang pointers", Author: "Mr. Golang", Year: "2010"},
-		Book{ID: 2, Title: "Goroutines", Author: "Mr. Goroutine", Year: "2011"},
-		Book{ID: 3, Title: "Golang routers", Author: "Mr. Router", Year: "2012"},
-		Book{ID: 4, Title: "Golang concurrency", Author: "Mr. Currency", Year: "2013"},
-		Book{ID: 5, Title: "Golang good parts", Author: "Mr. Good", Year: "2014"},
-	)
-
 	router.HandleFunc("/books", getBooks).Methods("GET")
 	router.HandleFunc("/books/{id}", getBook).Methods("GET")
 	router.HandleFunc("/books", addBook).Methods("POST")
@@ -65,9 +51,8 @@ func main() {
 }
 
 func getBooks(w http.ResponseWriter, r *http.Request) {
-	var book Book
-	books = []Book{}
-
+	var book models.Book
+	books = []models.Book{}
 	rows, err := db.Query("select * from books")
 	logFatal(err)
 
@@ -84,7 +69,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBook(w http.ResponseWriter, r *http.Request) {
-	var book Book
+	var book models.Book
 	params := mux.Vars(r)
 
 	rows := db.QueryRow("select * from books where id=$1", params["id"])
@@ -96,7 +81,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {
-	var book Book
+	var book models.Book
 	var bookID int
 
 	json.NewDecoder(r.Body).Decode(&book)
@@ -110,7 +95,7 @@ func addBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
-	var book Book
+	var book models.Book
 
 	json.NewDecoder(r.Body).Decode(&book)
 
