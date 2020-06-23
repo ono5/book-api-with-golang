@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"net/http"
 
-	"github.com/ono5/book-list/api/utils"
-
 	"github.com/ono5/book-list/api/models"
+	"github.com/ono5/book-list/api/repository/bookrepository"
+	"github.com/ono5/book-list/api/utils"
 )
 
 type Controller struct{}
@@ -18,19 +17,16 @@ var books []models.Book
 func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
+		var error models.Error
 		books = []models.Book{}
-		rows, err := db.Query("select * from books")
-		utils.LogFatal(err)
-
-		defer rows.Close()
-
-		for rows.Next() {
-			err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-			utils.LogFatal(err)
-
-			books = append(books, book)
+		bookRepo := bookrepository.BookRepository{}
+		books, err := bookRepo.GetBooks(db, book, books)
+		if err != nil {
+			error.Message = "Server Error"
+			utils.SendError(w, http.StatusInternalServerError, error)
+			return
 		}
-
-		json.NewEncoder(w).Encode(books)
+		w.Header().Set("Content-Type", "application/json")
+		utils.SendSuccess(w, books)
 	}
 }
