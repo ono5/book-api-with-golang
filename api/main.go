@@ -27,25 +27,13 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/books", controller.GetBooks(db)).Methods("GET")
-	router.HandleFunc("/books/{id}", getBook).Methods("GET")
+	router.HandleFunc("/books/{id}", controller.GetBook(db)).Methods("GET")
 	router.HandleFunc("/books", addBook).Methods("POST")
 	router.HandleFunc("/books", updateBook).Methods("PUT")
 	router.HandleFunc("/books/{id}", removeBook).Methods("DELETE")
 
 	log.Println("Server Start...")
 	log.Fatal(http.ListenAndServe(":8000", router))
-}
-
-func getBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	params := mux.Vars(r)
-
-	rows := db.QueryRow("select * from books where id=$1", params["id"])
-
-	err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-	utils.LogFatal(err)
-
-	json.NewEncoder(w).Encode(book)
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {

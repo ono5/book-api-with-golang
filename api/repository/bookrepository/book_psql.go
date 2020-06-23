@@ -25,3 +25,10 @@ func (b BookRepository) GetBooks(db *sql.DB, book models.Book, books []models.Bo
 
 	return books, nil
 }
+
+// GetBook - get abook from db
+func (b BookRepository) GetBook(db *sql.DB, book models.Book, id int) (models.Book, error) {
+	rows := db.QueryRow("select * from books where id=$1", id)
+	err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
+	return book, err
+}
