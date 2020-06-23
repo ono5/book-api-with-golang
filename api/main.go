@@ -11,7 +11,7 @@ import (
 	_ "database/sql"
 
 	_ "github.com/lib/pq"
-	models "github.com/ono5/books-list/api/model"
+	"github.com/ono5/book-list/api/models"
 
 	"github.com/gorilla/mux"
 )
