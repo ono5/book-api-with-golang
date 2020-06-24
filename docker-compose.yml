@@ -39,3 +39,4 @@ services:
             sh -c "cd frontend && npm start"
         ports:
             - "3000:3000"
+        stdin_open: true
