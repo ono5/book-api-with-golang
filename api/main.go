@@ -12,6 +12,7 @@ import (
 	"github.com/ono5/book-list/api/driver"
 	"github.com/ono5/book-list/api/models"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -31,5 +32,8 @@ func main() {
 	router.HandleFunc("/books/{id}", controller.RemoveBook(db)).Methods("DELETE")
 
 	log.Println("Server Start...")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(
+		handlers.AllowedHeaders([]string{"X-Requeste-With", "Content-Type", "Authorization"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"}),
+		handlers.AllowedOrigins([]string{"*"}))(router)))
 }
