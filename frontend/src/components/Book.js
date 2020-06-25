@@ -11,7 +11,7 @@ const Book = ({book}) => {
                 <button type="button" className="btn btn-danger">
                     Delete
                 </button>
-                <button type="button" className="btn btn-secondary">
+                <button type="button" className="btn btn-default">
                     Edit
                 </button>
             </td>
