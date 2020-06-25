@@ -32,7 +32,7 @@ class Books extends Component {
                                             <button type="button" className="btn btn-danger">
                                                 Delete
                                             </button>
-                                            <button type="button" className="btn btn-default">
+                                            <button type="button" className="btn btn-secondary">
                                                 Edit
                                             </button>
                                         </td>
