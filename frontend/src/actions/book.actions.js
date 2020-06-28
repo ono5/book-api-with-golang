@@ -13,6 +13,17 @@ import {
     FETCH_BOOKS_SUCCESS
 } from './types'
 
+import { books } from '../data';
+
+export const fetchBooksSuccess = (data) => {
+    return {
+        type: FETCH_BOOKS_SUCCESS,
+        payload: data,
+    }
+}
+
 export const fetchBooks = () => {
-    debugger;
+    return (dispatch) => {
+        dispatch(fetchBooksSuccess(books))
+    }
 }
