@@ -13,7 +13,9 @@ import {
     FETCH_BOOKS_SUCCESS
 } from './types'
 
-import { books } from '../data';
+import axios from 'axios';
+
+const url = 'http://localhost:8000/books';
 
 export const fetchBooksSuccess = (data) => {
     return {
@@ -22,8 +24,30 @@ export const fetchBooksSuccess = (data) => {
     }
 }
 
+const normalizeResponse = (data) => {
+    const arr = data.map(item => {
+        const keys = Object.keys(item);
+
+        keys.forEach(k => {
+            item[k.toLowerCase()] = item[k];
+            delete item[k];
+        });
+
+        return item;
+    })
+
+    return arr;
+}
+
 export const fetchBooks = () => {
     return (dispatch) => {
-        dispatch(fetchBooksSuccess(books))
+        return axios.get(url)
+            .then(response => {
+                const data = normalizeResponse(response.data);
+                debugger
+                dispatch(fetchBooksSuccess(data));
+            }).catch(error => {
+
+            });
     }
 }
