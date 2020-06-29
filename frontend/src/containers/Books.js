@@ -9,36 +9,43 @@ class Books extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <table className="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Year</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.props.books.map(book => {
-                                return (
-                                    <Book key={book.id} book={book}/>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
-            </div>
-        )
+        if (this.props.isLoading) {
+            return (
+                <p>Loading...</p>
+            )
+        } else {
+            return (
+                <div>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Year</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.props.books.map(book => {
+                                    return (
+                                        <Book key={book.id} book={book}/>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            )
+        }
     }
 }
 
 const mapStateToProps = (state) => {
     return {
             books: state.booksData.books || [],
+            isLoading: state.booksData.isLoading,
     };
 };
 

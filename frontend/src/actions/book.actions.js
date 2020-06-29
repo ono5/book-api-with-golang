@@ -24,30 +24,28 @@ export const fetchBooksSuccess = (data) => {
     }
 }
 
-const normalizeResponse = (data) => {
-    const arr = data.map(item => {
-        const keys = Object.keys(item);
-
-        keys.forEach(k => {
-            item[k.toLowerCase()] = item[k];
-            delete item[k];
-        });
-
-        return item;
-    })
-
-    return arr;
+export const fetchBooksLoading = (data) => {
+    return {
+        type: FETCH_BOOKS_LOADING,
+        payload: data,
+   };
 }
 
 export const fetchBooks = () => {
+    let isLoading = true;
+
     return (dispatch) => {
+        dispatch(fetchBooksLoading(isLoading));
         return axios.get(url)
             .then(response => {
-                const data = normalizeResponse(response.data);
-                debugger
+                const data = response.data;
                 dispatch(fetchBooksSuccess(data));
+                isLoading = false;
+                dispatch(fetchBooksLoading(isLoading));
             }).catch(error => {
-
+                console.log(error);
+                isLoading = false;
+                dispatch(fetchBooksLoading(isLoading));
             });
     }
 }
