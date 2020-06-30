@@ -14,8 +14,55 @@ import {
 } from './types'
 
 import axios from 'axios';
+import { history } from '../index';
 
 const url = 'http://localhost:8000/books';
+
+// CREATE----------------------------------------
+export const createBookSuccess = (data) => {
+    return {
+        type: ADD_BOOK_SUCCESS,
+        payload: data,
+    }
+}
+
+export const createBook = (book) => {
+    const data = {
+        title: book.title,
+        author: book.author,
+        year: book.year,
+    }
+
+    return (dispatch) => {
+        return axios.post(url, data)
+            .then(response => {
+                const id = response.data;
+                axios.get(`${url}/${id}`)
+                    .then(response => {
+                        const data = response.data;
+                        const normalizeData = {
+                            id: data.id,
+                            title: data.title,
+                            author: data.author,
+                            year: data.year,
+                        };
+
+                        dispatch(createBookSuccess(normalizeData));
+                        history.puah('/');
+                    }).catch(error => {
+                        console.log(error);
+                    })
+            }).catch(error => {
+                console.log(error);
+            });
+    }
+}
+
+// EDIT------------------------------------------
+
+// DELETE----------------------------------------
+
+// FETCH-----------------------------------------
 
 export const fetchBooksSuccess = (data) => {
     return {
