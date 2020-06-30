@@ -31,6 +31,13 @@ export const fetchBooksLoading = (data) => {
    };
 }
 
+export const fetchBooksError = (data) => {
+    return {
+        type: FETCH_BOOKS_ERROR,
+        payload: data,
+    };
+}
+
 export const fetchBooks = () => {
     let isLoading = true;
 
@@ -43,7 +50,10 @@ export const fetchBooks = () => {
                 isLoading = false;
                 dispatch(fetchBooksLoading(isLoading));
             }).catch(error => {
-                console.log(error);
+                const errorPayload = {};
+                errorPayload['message'] = error.response.statusText;
+                errorPayload['status'] = error.response.status;
+                dispatch(fetchBooksError(errorPayload));
                 isLoading = false;
                 dispatch(fetchBooksLoading(isLoading));
             });

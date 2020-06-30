@@ -13,6 +13,12 @@ class Books extends Component {
             return (
                 <p>Loading...</p>
             )
+        } else if (this.props.error){
+            return (
+                <div className="alert alert-danger" role="alert">
+                    {this.props.error.message}
+                </div>
+            )
         } else {
             return (
                 <div>
@@ -45,6 +51,7 @@ class Books extends Component {
 const mapStateToProps = (state) => {
     return {
             books: state.booksData.books || [],
+            error: state.booksData.error || null,
             isLoading: state.booksData.isLoading,
     };
 };
